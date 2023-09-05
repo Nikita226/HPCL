@@ -1,46 +1,49 @@
-#include <omp.h>
-#include <pthread.h>
 #include <stdio.h>
+#include <omp.h>
+#include <time.h>
+
+#define size 1000
+#define NUM_THREADS 100
+
+void vectorScalarAdd(int* vector, int scalar) 
+{
+    #pragma omp parallel for private(scalar) num_threads(NUM_THREADS)
+        #pragma omp nowait
+        for (int i = 0; i < size; i++) 
+        {
+            vector[i] += scalar;
+        }
+}
 
 int main() {
-    int N;
-    printf("Enter the size of vector: ");
-    scanf("%d", &N);
+    int vector[size];
+    int scalar = 5;
 
-    int A[N];
-    for (int i = 0; i < N; i++)
-        A[i] = 10;
-
-    int B[N];
-    for (int i = 0; i < N; i++)
-        B[i] = 20;
-
-    int C[N];
-    for (int i = 0; i < N; i++)
-        C[i] = 0;
-    double stime = omp_get_wtime();
-
-    int numThreads;
-    printf("Enter the number of threads: ");
-    scanf("%d", &numThreads); 
-    omp_set_num_threads(numThreads);
-
-    #pragma omp parallel for reduction(+ : C)
-    for (int i = 0; i < N; i++) 
-    {
-        C[i] = A[i] + B[i];
+    for (int i = 0; i < size; i++) {
+        vector[i] = i+10;
     }
 
-    for (int i = 0; i < N; i++) 
-    {
-        printf("%d ", C[i]);
+    printf("Original Vector:\n");
+    for (int i = 0; i < size; i++) {
+        printf("%d ", vector[i]);
     }
-
-    double etime = omp_get_wtime();
-    double time = etime - stime;
-    printf("\n\nSize of Vector: %d", N);
-    printf("\nNumber of Threads: %d", numThreads);
-    printf("\nTime taken is %f\n", time);
     printf("\n");
+    clock_t start_time = clock();
+    vectorScalarAdd(vector, scalar);
+    
+    clock_t end_time = clock();
+    double elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+   
+    printf("Vector after Scalar Addition:\n");
+    for (int i = 0; i < size; i++) 
+    {
+        printf("%d ", vector[i]);
+    }
+    printf("\n");
+    printf("Execution Time: %f seconds\n", elapsed_time);
+    printf("Number of threads: %d \n",NUM_THREADS);
+    printf("Input Size: %d",size);
+
     return 0;
 }

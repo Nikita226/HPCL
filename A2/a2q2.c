@@ -5,7 +5,8 @@
 
 #define NUM_SAMPLES 10000000
 
-int main() {
+int main() 
+{
     int num_threads[] = {1, 2, 4, 6, 8, 10}; // Number of threads to test
     int num_sizes[] = {1000, 900, 100000, 600}; // Different data sizes to test
 
