@@ -2,7 +2,7 @@
 #include <omp.h>
 #include <time.h>
 
-#define N 20
+#define N 10
 
 long long fib[N];
 
@@ -12,11 +12,11 @@ void parallel_fib(int n) {
         return;
     }
 
-    #pragma omp task shared(fib) 
+    #pragma omp task private(fib) 
     // printf("task1 by %d\n",n-1);
     parallel_fib(n - 1);
 
-    #pragma omp task shared(fib) 
+    #pragma omp task private(fib) 
     // printf("task2 by %d\n",n-2);
     parallel_fib(n - 2);
 
@@ -30,9 +30,9 @@ int main() {
     
     clock_t start=clock();
         // printf("No. of threads: %d\n",omp_get_num_threads());
-    #pragma omp parallel
+    #pragma omp parallel num_threads(5)
     {
-        #pragma omp single
+        #pragma omp
         parallel_fib(n);
     }
     clock_t end=clock();
