@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <omp.h>
 #include <time.h>
-#define N 40
-#define threads 20
+#define N 50
 long long fib[N];
 void parallel_fib(int n) 
 {
@@ -19,14 +17,9 @@ int main()
 {
     int n = N; 
     clock_t start=clock();
-    #pragma omp parallel num_threads(threads)
-    {
-        #pragma omp
-        parallel_fib(n);
-    }
+    parallel_fib(n);
     clock_t end=clock();
     printf("\nFibonacci(%d) = %lld", n, fib[n]);
-    printf("\nNumber of Threads: %d", threads);
-    printf("\nTime: %f\n\n",(double)(end-start)/CLOCKS_PER_SEC);
+    printf("    Time: %f\n\n",(double)(end-start)/CLOCKS_PER_SEC);
     return 0;
 }

@@ -34,8 +34,7 @@ int main()
 		"\n3. Press 3 for Exit");
     
     clock_t start=clock();
-    // #pragma omp critical
-	#pragma omp parallel
+    #pragma omp critical
 	for (i = 1; i > 0; i++) 
 	{
 

@@ -1,49 +1,34 @@
 #include <stdio.h>
-#include <omp.h>
+#include <stdlib.h>
 #include <time.h>
-
-#define size 1000
-#define NUM_THREADS 100
-
-void vectorScalarAdd(int* vector, int scalar) 
-{
-    #pragma omp parallel for private(scalar) num_threads(NUM_THREADS)
-        #pragma omp nowait
-        for (int i = 0; i < size; i++) 
-        {
-            vector[i] += scalar;
-        }
-}
-
+#include <omp.h> // Include OpenMP library
+#define SIZE 100000  // Define size of the vector
+#define NUM_THREADS 4   // Define number of threads
+#define CHUNK 1000
 int main() {
-    int vector[size];
-    int scalar = 5;
-
-    for (int i = 0; i < size; i++) {
-        vector[i] = i+10;
-    }
-
-    printf("Original Vector:\n");
-    for (int i = 0; i < size; i++) {
-        printf("%d ", vector[i]);
-    }
-    printf("\n");
-    clock_t start_time = clock();
-    vectorScalarAdd(vector, scalar);
-    
-    clock_t end_time = clock();
-    double elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-
-   
-    printf("Vector after Scalar Addition:\n");
-    for (int i = 0; i < size; i++) 
+    clock_t st=clock();
+    omp_set_num_threads(NUM_THREADS);  // Set the number of threads
+    int vector[SIZE];   // Create the vector and scalar
+    int scalar = 50000; 
+    // #pragma omp parallel for schedule(static,CHUNK) // Generate a vector in parallel
+    #pragma omp parallel for schedule(dynamic,CHUNK)
+    for (int i = 0; i < SIZE; i++) 
     {
-        printf("%d ", vector[i]);
+        vector[i] = 100000;
     }
-    printf("\n");
-    printf("Execution Time: %f seconds\n", elapsed_time);
-    printf("Number of threads: %d \n",NUM_THREADS);
-    printf("Input Size: %d",size);
-
+    // #pragma omp parallel for schedule(static,CHUNK)  // Perform vector-scalar addition in parallel
+    #pragma omp parallel for schedule(dynamic,CHUNK)
+    for (int i = 0; i < SIZE; i++) 
+    {
+        vector[i] += scalar;
+    }
+    //printf("Resulting Vector: ");      // Display the resulting vector
+    for (int i = 0; i < SIZE; i++) {
+       // printf("%d ", vector[i]);
+    }
+    clock_t et = clock();
+    double tt = (double)(et-st) / CLOCKS_PER_SEC;
+    printf("Num of threads: %d", NUM_THREADS);
+    printf("\nTime required parallel program for Size %d and Chunk Size %d: %f\n",SIZE,CHUNK,tt);
     return 0;
 }
